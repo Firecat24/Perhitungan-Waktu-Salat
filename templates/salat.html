@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="../static/styles/salat.css">
+    <title>
+        Website perhitungan awal waktu salat
+    </title>
+</head>
+<body>
+    <h2 class="h2">Perhitungan waktu salat</h2>
+    <form method="post">
+    <table border="5px" style="width: 100% ;">
+        <tr>
+            
+            <th>kolom lintang</th>
+            <th>kolom bujur</th>
+            <th>kolom tinggi tempat</th>
+            <th>Tanggal Hitung</th>
+        </tr>
+        <tr>
+            
+            <td><input class="input" type="text" placeholder="Jam" name="klj"></td>
+            <td><input class="input" type="text" placeholder="Jam" name="kbj"></td>
+            <td><input class="input" type="text" placeholder="Tinggi Tempat" name="kt"></td>
+            <td><input class="input" type="text" placeholder="Tahun" name="ktj"></td>
+        </tr>
+        <tr>
+            
+            <td><input class="input" type="text" placeholder="menit" name="klm"></td>
+            <td><input class="input" type="text" placeholder="menit" name="kbm"></td>
+            <th>kolom koreksi waktu daerah</th>
+            <td><input class="input" type="text" placeholder="Bulan" name="kbbm"></td>
+        </tr>
+        <tr>
+            
+            <td><input class="input" type="text" placeholder="detik" name="kld"></td>
+            <td><input class="input" type="text" placeholder="detik" name="kbd"></td>
+            <td><input class="input" type="text" placeholder="Zona Waktu" name="kzw"></td>
+            <td><input class="input" type="text" placeholder="Hari" name="khd"></td>
+        </tr>
+        
+        <tr>
+            
+            <th>Deklinasi Subuh</th>
+            <th>Deklinasi Asar</th>
+            <th>Deklinasi Magrib</th>
+            <th>Deklinasi Isya</th>
+        </tr>
+        <tr>
+            <td><input class="input" type="text" placeholder="Jam 21 Hari Kemaren " name="kds"></td>
+            <td><input class="input" type="text" placeholder="Jam 15" name="kda"></td>
+            <td><input class="input" type="text" placeholder="Jam 10" name="kdm"></td>
+            <td><input class="input" type="text" placeholder="Jam 12" name="kdi"></td>
+        </tr>
+        <tr>
+            <td><input class="input" type="text" placeholder="Menit" name="kdsm"></td>
+            <td><input class="input" type="text" placeholder="Menit" name="kdam"></td>
+            <td><input class="input" type="text" placeholder="Menit" name="kdmm"></td>
+            <td><input class="input" type="text" placeholder="Menit" name="kdim"></td>
+        </tr>
+        <tr>
+            <td><input class="input" type="text" placeholder="Detik" name="kdsd"></td>
+            <td><input class="input" type="text" placeholder="Detik" name="kdad"></td>
+            <td><input class="input" type="text" placeholder="Detik" name="kdmd"></td>
+            <td><input class="input" type="text" placeholder="Detik" name="kdid"></td>
+        </tr>
+    </table>
+    <input type="submit" value="hitung" class="button1"></input>
+    </form>
+
+        <table border="5px" style="width: 100%;">
+            <tr>
+                <th>{{ Subuh }}</th>
+                <th>{{ Zuhur }}</th>
+                <th>{{ Asar }}</th>
+                <th>{{ Magrib }}</th>
+                <th>{{ Isya }}</th>
+            </tr>
+        </table>
+
+</body>

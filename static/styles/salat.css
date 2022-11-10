@@ -1,0 +1,28 @@
+.button1{
+    border: 3px;
+    color: wheat;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    background-color: black;
+}
+.kolom_subuh{
+    background-color: white;
+    text-align: center;
+    padding: 30px;
+    border: 1px outset black;
+}
+.td_nih{
+    background-color: black;
+}
+.input{
+    width: 97.5%;
+}
+.h2{
+    text-align: center;
+    background-color: aquamarine;
+}
