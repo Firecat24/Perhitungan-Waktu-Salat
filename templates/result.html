@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Perhitungan Waktu Sholat</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='../static/styles/result.css'>
+</head>
+<body>
+    <main>
+        <h1>Perhitungan Waktu Sholat</h1>
+        <hr>
+        {% for content in result %}
+        <section class="content">
+            <h2>{{ content[0] }}</h2>
+            <hr>
+            <p class="waktu">Subuh</p><p class="jam"> {{ content[1] }}</p>
+            <p class="waktu">Zuhur</p><p class="jam">{{ content[2] }}</p>
+            <p class="waktu">Asar</p><p class="jam">{{ content[3] }}</p>
+            <p class="waktu">Magrib</p><p class="jam">{{ content[4] }}</p>
+            <p class="waktu">Isya</p><p class="jam">{{ content[5] }}</p>
+            <hr>
+        </section>
+        {% endfor %}
+    </main>
+</body>
+</html>

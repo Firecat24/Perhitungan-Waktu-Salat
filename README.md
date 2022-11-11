@@ -2,6 +2,5 @@
 menghitung waktu salat 5 waktu 
 
 
-# In Development
-- Route the form action to another page
-- Calculate time for the next 5 days
+# For the next task
+-  Fix website design
