@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect
+from calendar import monthrange
 from datetime import datetime
 import math
 
@@ -15,20 +16,8 @@ def result():
         return redirect("/", code=405)
     elif request.method == "POST":
         results = []
-        for i in range(-1, 4):
+        for i in range(0, 20):
             result = []
-            deklinasi_jam_1, deklinasi_menit_1, deklinasi_detik_1 = request_form("kds", "kdsm", "kdsd")
-            rdeklinasi_subuh = math.radians((deklinasi_jam_1) + (deklinasi_menit_1/60) + (deklinasi_detik_1/3600))
-
-            deklinasi_jam_2, deklinasi_menit_2, deklinasi_detik_2 = request_form("kda", "kdam", "kdad")
-            rdeklinasi_asar = math.radians((deklinasi_jam_2) + (deklinasi_menit_2/60) + (deklinasi_detik_2/3600))
-
-            deklinasi_jam_3, deklinasi_menit_3, deklinasi_detik_3 = request_form("kdm", "kdmm", "kdmd")
-            rdeklinasi_magrib = math.radians((deklinasi_jam_3) + (deklinasi_menit_3/60) + (deklinasi_detik_3/3600))
-
-            deklinasi_jam_4, deklinasi_menit_4, deklinasi_detik_4 = request_form("kdm", "kdmm", "kdmd")
-            rdeklinasi_isya = math.radians((deklinasi_jam_4) + (deklinasi_menit_4/60) + (deklinasi_detik_4/3600))
-
             lintang_jam, lintang_menit, lintang_detik = request_form("klj", "klm", "kld")
             lintang = math.radians((lintang_jam) + (lintang_menit/60) + (lintang_detik/3600))
 
@@ -38,39 +27,42 @@ def result():
             zona_waktu = int(request.form["kzw"])
             KWD = ((zona_waktu - bujur)/15)
 
-            Hari, Bulan, Tahun = request_form("kbj", "kbbm", "ktj")
+            Hari, Bulan, Tahun = request_form("khd", "kbbm", "ktj")
             Hari = Hari + i
             date = datetime(Tahun, Bulan, Hari)
             tanggal = convert_date(date)
-            if Bulan == 1:
+            if Bulan <=2 :
+                Bulan = Bulan + 12
                 Tahun = Tahun - 1
-                Bulan = 1 + 12
-            if Bulan == 2:
-                Tahun = Tahun - 1
-                Bulan = 2 + 12
-
-            
-            A = math.floor (Tahun/100)
-            B = 2 + math.floor (A/4) - A
-
+                A = math.floor (Tahun/100)
+            else :
+                A = math.floor (Tahun/100)
+            if Tahun <=1582:
+                B = 0
+            elif Tahun >1582:
+                B = 2 + math.floor (A/4) - A
             Dsubuh = (Hari-1) + (((21 * 3600)+(0 * 60)+ 0)/86400)
             Dzuhur = Hari + (((5 * 3600)+(0 * 60)+ 0)/86400)
             Dasar = Hari + (((8 * 3600)+(0 * 60)+ 0)/86400)
             Dmagrib = Hari + (((11 * 3600)+(0 * 60)+ 0)/86400)
             Disya = Hari + (((12 * 3600)+(0 * 60)+ 0)/86400)
 
-            eot = perhitungan_equation(Tahun, Bulan, B, Dzuhur)
+            deklinasi_zuhur, eot = perhitungan_equation(Tahun, Bulan, B, Dzuhur)
             EoT_zuhur = eot
-            eot = perhitungan_equation(Tahun, Bulan, B, Dsubuh)
+            rdeklinasi_zuhur = math.radians(deklinasi_zuhur)
+            deklinasi_subuh, eot = perhitungan_equation(Tahun, Bulan, B, Dsubuh)
             EoT_subuh = eot
-            eot = perhitungan_equation(Tahun, Bulan, B, Dasar)
+            rdeklinasi_subuh = math.radians(deklinasi_subuh)
+            deklinasi_asar, eot = perhitungan_equation(Tahun, Bulan, B, Dasar)
             EoT_asar = eot
-            eot = perhitungan_equation(Tahun, Bulan, B, Dmagrib)
+            rdeklinasi_asar = math.radians(deklinasi_asar)
+            deklinasi_magrib, eot = perhitungan_equation(Tahun, Bulan, B, Dmagrib)
             EoT_magrib = eot
-            eot = perhitungan_equation(Tahun, Bulan, B, Disya)
+            rdeklinasi_magrib = math.radians(deklinasi_magrib)
+            deklinasi_isya, eot = perhitungan_equation(Tahun, Bulan, B, Disya)
             EoT_isya = eot
+            rdeklinasi_isya = math.radians(deklinasi_isya)
 
-            # tinggi_tempat_jam = int(request.form["kt"])
             i = 2/60
 
             # subuh
@@ -80,7 +72,7 @@ def result():
             # asar
             
             lintang1 = lintang_jam + (lintang_menit/60) + (lintang_detik/3600)
-            deklinasi_2 = deklinasi_jam_2 + (deklinasi_menit_2/60) + (deklinasi_detik_2/3600)
+            deklinasi_2 = deklinasi_asar
             tinggi_asar0= math.radians(abs(lintang1 - deklinasi_2))
             tinggi_asar= math.degrees(math.atan(1/((math.tan(tinggi_asar0))+1)))
             rtinggi_asar= math.radians(tinggi_asar)
@@ -143,19 +135,58 @@ def hasil(Pk):
 
 def perhitungan_equation (Tahun, Bulan, B, Dzuhur):
     JD = 1720994.5 + math.floor(365.25*Tahun)+ math.floor(30.6001*(Bulan+1))+ (B) + (Dzuhur)
-    U = (JD - 2451545)/36525
-    L00 = 280.46607 + (36000.7698*U)
-    L01 = math.floor((280.46607 + (36000.7698*U))/360)
+    T = (JD - 2451545)/36525
+    L00 = 280.46607 + (36000.7698*T)
+    L01 = math.floor((280.46607 + (36000.7698*T))/360)
     L02 = L01 * 360
     L0 =  L00 - L02
     L0R = math.radians (L0)
-    EoT = (-(1789 + 237 * U)* math.sin (L0R) - (7146 - 62*U)* math.cos (L0R) + (9934 - 14*U)* math.sin(2*L0R)- (29 + 5*U)* math.cos(2*L0R) + (74 + 10*U)* math.sin(3*L0R) + (320 - 4*U)* math.cos(3*L0R) - 212* math.sin(4*L0R))/1000
+    EoT = (-(1789 + 237 * T)* math.sin (L0R) - (7146 - 62*T)* math.cos (L0R) + (9934 - 14*T)* math.sin(2*L0R)- (29 + 5*T)* math.cos(2*L0R) + (74 + 10*T)* math.sin(3*L0R) + (320 - 4*T)* math.cos(3*L0R) - 212* math.sin(4*L0R))/1000
     Jam = 0
     Menit = math.floor(EoT)
     detik0 = EoT - math.floor(EoT)
     detik = math.floor((detik0)*60)
     eot = Jam + (Menit/60) + (detik/3600)
-    return eot
+    U = T/100
+    L0 = 280.46646 + (36000.76983*T)+ (0.0003032*(T**2))
+    while L0 < 0:
+        L0 += 360
+    while L0 > 360:
+        L0 -= 360
+    M = 357.52911 + (35999.05029*T)+ (0.0001537*(T**2))
+    while M < 0:
+        M += 360
+    while M > 360:
+        M -= 360
+    Mrad = math.radians(M)
+    eksentrisitas = 0.016708634 - (0.000042037*T) - (0.0000001267*(T**2))
+    C = (1.914602-(0.004817*T)- 0.000014*(T**2))* math.sin(Mrad) + (0.019993-(0.000101*T))* math.sin(2*Mrad) + 0.000289 * math.sin(3*Mrad)
+    longitude = L0 + C
+    longituderad = math.radians(longitude)
+    v = M + C
+    vrad = math.radians(v)
+    R = 1.000001018*(1-(eksentrisitas**2)) / (1 + eksentrisitas *math.cos(vrad))
+    omega = 125.04452 - 1934.136261*T + 0.0020708*(T**2) + ((T**3)/450000)
+    omegarad = math.radians(omega)
+    lamda = longitude - 0.00569 - 0.00478 * math.sin(omegarad)
+    L = 280.4665 + 36000.7698*T
+    Lrad = math.radians(L)
+    L1 = 218.3165 + 481267.8813*T
+    L1rad = math.radians(L1)
+    #sampek sini delta_obliquity memakai rumus low accuracy 
+    delta_obliquity1 = ((9.20/3600) * math.cos(omegarad)) + (0.57/3600)* math.cos(2*Lrad) + (0.10/3600)*math.cos(2*L1rad) - (0.09/3600)*math.cos(2*omegarad)
+    epsilon0 = (23*3600) + (26*60) + 21.448 - 4680.93*U - 1.55*(U**2) + 1999.25*(U**3) - 51.38*(U**4) - 249.67*(U**5) - 39.05*(U**6) + 7.12*(U**7) + 27.87*(U**8) + 5.79*(U**9) + 2.45*(U**10)
+    obliquity = epsilon0/3600
+    obliquity_benar = obliquity + delta_obliquity1
+    obliquity_benarrad = math.radians(obliquity_benar)
+    alpha = math.degrees(math.atan2((math.cos(obliquity_benarrad)* math.sin(longituderad)), math.cos(longituderad)))
+    while alpha < 0:
+        alpha += 360
+    while alpha > 360:
+        alpha -= 360
+    deklinasi = math.degrees(math.asin(math.sin(obliquity_benarrad)* math.sin(longituderad)))
+    return deklinasi, eot
+    
 
 def perhitungan_degree(rlintang, rdeklinasi, rtinggi):
     t = math.degrees(math.acos(-math.tan(rlintang)* math.tan(rdeklinasi)+ 1/math.cos(rlintang)* 1/math.cos(rdeklinasi)* math.sin (rtinggi)))
