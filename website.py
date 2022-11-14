@@ -16,7 +16,13 @@ def result():
         return redirect("/", code=405)
     elif request.method == "POST":
         results = []
-        for i in range(0, 20):
+        Hari, Bulan, Tahun = request_form("khd", "kbbm", "ktj")
+        month = Bulan
+        year = Tahun
+        Hari = 1
+        datenow = datetime(Tahun, Bulan, Hari)
+        max_day = monthrange(datenow.year, datenow.month)[1]
+        for day in range(1, max_day+1):
             result = []
             lintang_jam, lintang_menit, lintang_detik = request_form("klj", "klm", "kld")
             lintang = math.radians((lintang_jam) + (lintang_menit/60) + (lintang_detik/3600))
@@ -25,12 +31,11 @@ def result():
             bujur = (bujur_jam) + (bujur_menit/60) + (bujur_detik/3600)
 
             zona_waktu = int(request.form["kzw"])
-            KWD = ((zona_waktu - bujur)/15)
-
-            Hari, Bulan, Tahun = request_form("khd", "kbbm", "ktj")
-            Hari = Hari + i
-            date = datetime(Tahun, Bulan, Hari)
+            KWD = ((zona_waktu - bujur)/15) 
+            date = datetime(year, month, day)
             tanggal = convert_date(date)
+
+
             if Bulan <=2 :
                 Bulan = Bulan + 12
                 Tahun = Tahun - 1
@@ -41,11 +46,11 @@ def result():
                 B = 0
             elif Tahun >1582:
                 B = 2 + math.floor (A/4) - A
-            Dsubuh = (Hari-1) + (((21 * 3600)+(0 * 60)+ 0)/86400)
-            Dzuhur = Hari + (((5 * 3600)+(0 * 60)+ 0)/86400)
-            Dasar = Hari + (((8 * 3600)+(0 * 60)+ 0)/86400)
-            Dmagrib = Hari + (((11 * 3600)+(0 * 60)+ 0)/86400)
-            Disya = Hari + (((12 * 3600)+(0 * 60)+ 0)/86400)
+            Dsubuh = (day-1) + (((21 * 3600)+(0 * 60)+ 0)/86400)
+            Dzuhur = day + (((5 * 3600)+(0 * 60)+ 0)/86400)
+            Dasar = day + (((8 * 3600)+(0 * 60)+ 0)/86400)
+            Dmagrib = day + (((11 * 3600)+(0 * 60)+ 0)/86400)
+            Disya = day + (((12 * 3600)+(0 * 60)+ 0)/86400)
 
             deklinasi_zuhur, eot = perhitungan_equation(Tahun, Bulan, B, Dzuhur)
             EoT_zuhur = eot
@@ -103,16 +108,16 @@ def result():
             t_selesai_isya = (t_isya)/15
             pk4 = 12-(EoT_isya)+(t_selesai_isya)+(KWD)+(i)
             
-            jams, menits, detiks = hasil (pk)
-            Subuh = "{jam}:{menit}:{detik}".format(jam=jams, menit=menits, detik=detiks)
-            jams, menits, detiks = hasil (pk1)
-            Zuhur = "{jam}:{menit}:{detik}".format(jam=jams, menit=menits, detik=detiks)
-            jams, menits, detiks = hasil (pk2)
-            Asar = "{jam}:{menit}:{detik}".format(jam=jams, menit=menits, detik=detiks)
-            jams, menits, detiks = hasil (pk3)
-            Magrib = "{jam}:{menit}:{detik}".format(jam=jams, menit=menits, detik=detiks)
-            jams, menits, detiks = hasil (pk4)
-            Isya = "{jam}:{menit}:{detik}".format(jam=jams, menit=menits, detik=detiks)
+            jams, menits = hasil (pk)
+            Subuh = "{jam}:{menit}".format(jam=jams, menit=str(menits).zfill(2))
+            jams, menits = hasil (pk1)
+            Zuhur = "{jam}:{menit}".format(jam=jams, menit=str(menits).zfill(2))
+            jams, menits = hasil (pk2)
+            Asar = "{jam}:{menit}".format(jam=jams, menit=str(menits).zfill(2))
+            jams, menits = hasil (pk3)
+            Magrib = "{jam}:{menit}".format(jam=jams, menit=str(menits).zfill(2))
+            jams, menits = hasil (pk4)
+            Isya = "{jam}:{menit}".format(jam=jams, menit=str(menits).zfill(2))
             result.append(tanggal)
             result.append(Subuh)
             result.append(Zuhur)
@@ -121,17 +126,14 @@ def result():
             result.append(Isya)
             results.append(result)
             tupled = tuple(results)
-        
+       
         return render_template("result.html", result = tupled, len = len(tupled))
 
 def hasil(Pk):
     jams = math.floor(Pk)
     menit0 = (Pk) - math.floor(Pk)
-    menits = math.floor((menit0)*60)
-    detik0 = (Pk) - math.floor(Pk)
-    detik1 = (detik0) - (math.floor(detik0)*60)
-    detiks = math.floor((detik1)*60)
-    return jams, menits, detiks
+    menits = round((menit0)*60)
+    return jams, menits
 
 def perhitungan_equation (Tahun, Bulan, B, Dzuhur):
     JD = 1720994.5 + math.floor(365.25*Tahun)+ math.floor(30.6001*(Bulan+1))+ (B) + (Dzuhur)
@@ -219,9 +221,9 @@ def convert_date(date_conversion):
         if 'January' in date_converted:
             date_converted = date_converted.replace("January", "Januari")
         elif 'February' in date_converted:
-            date_converted = date_converted.replace("February", "February")
+            date_converted = date_converted.replace("February", "Februari")
         elif 'March' in date_converted:
-            date_converted = date_converted.replace("March", "March")
+            date_converted = date_converted.replace("March", "Maret")
         elif 'April' in date_converted:
             date_converted = date_converted.replace("April", "April")
         elif 'May' in date_converted:

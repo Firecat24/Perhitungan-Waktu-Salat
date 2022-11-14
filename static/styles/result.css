@@ -1,6 +1,8 @@
 body {
     font-family: monospace;
     background-image: url("../images/mecca.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 h1 {
